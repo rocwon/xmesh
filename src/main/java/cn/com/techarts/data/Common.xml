@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.techarts.data.common">	
+	<select id="getAutoId" resultType="int">
+		select LAST_INSERT_ID()
+	</select>
+	
+	<select id="getWhiteList" resultType="WhiteList">
+		select ip, services from sys_whitelist
+	</select>
+	
+	<select id="getClusterNodes" resultType="ServiceNode">
+		select ss.id, ss.owner, ss.name, ss.url, ss.status, ss.master, ss.catalog as serviceGroup from sys_servers ss
+	</select>
+	
+</mapper>
