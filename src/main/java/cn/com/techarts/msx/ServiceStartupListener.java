@@ -11,7 +11,7 @@ import javax.servlet.ServletContextListener;
 
 import cn.com.techarts.msx.rpc.MsxClient;
 import cn.com.techarts.util.FileHelper;
-import cn.com.techarts.util.RedisHelper;
+import cn.techarts.jhelper.Cacher;
 import cn.techarts.jhelper.Empty;
 import cn.techarts.jhelper.Executor;
 import cn.techarts.jhelper.Spliter;
@@ -46,7 +46,7 @@ public abstract class ServiceStartupListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		RedisHelper.destroy();
+		Cacher.destroy();
 		var executor = (ExecutorService) 
 				 arg0.getServletContext().getAttribute(ASYNC_EXECUTOR);
 		if(executor != null && !executor.isShutdown()) executor.shutdown();
@@ -65,7 +65,7 @@ public abstract class ServiceStartupListener implements ServletContextListener {
 		try {
 			var param = Spliter.split(cacheSettings, ',');
 			if(param == null || param.size() != 3) return;
-			RedisHelper.init(param.get(0), param.get(1), param.get(2));
+			Cacher.init(param.get(0), param.get(1), param.get(2));
 		}catch(RuntimeException e) {
 			throw new RuntimeException("Failed to start service. " + e.getMessage());
 		}

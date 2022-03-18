@@ -10,7 +10,7 @@ import java.util.Set;
 import cn.com.techarts.data.DaoHelper;
 import cn.com.techarts.msx.cluster.ServiceNode;
 import cn.com.techarts.msx.cluster.WhiteList;
-import cn.com.techarts.util.RedisHelper;
+import cn.techarts.jhelper.Cacher;
 import cn.techarts.jhelper.Empty;
 
 /**
@@ -69,7 +69,7 @@ public class ServiceCache {
 	}
 	
 	public static List<ServiceNode> reloadClusters(DaoHelper persister) {
-		RedisHelper.clearCache(clusterCacheIndex);
+		Cacher.clearCache(clusterCacheIndex);
 		List<ServiceNode> nodes = persister.getAll("getClusterNodes", null);
 		if(nodes == null || nodes.isEmpty()) return List.of();
 		var groups = new HashMap<String, List<String>>(32);
@@ -84,7 +84,7 @@ public class ServiceCache {
 		}
 		for(var entry : groups.entrySet()) {
 			if(entry.getValue().isEmpty()) continue;
-			RedisHelper.saveList(clusterCacheIndex, entry.getKey(), entry.getValue(), 0);
+			Cacher.saveList(clusterCacheIndex, entry.getKey(), entry.getValue(), 0);
 		}
 		
 		List<WhiteList> whitelist = persister.getAll("getWhiteList", null);
@@ -94,7 +94,7 @@ public class ServiceCache {
 			if(Empty.is(white.getIp())) continue;
 			whiteListMap.put(white.getIp(), white.getServices());
 		}
-		RedisHelper.saveStrings(clusterCacheIndex, whiteListMap);
+		Cacher.saveStrings(clusterCacheIndex, whiteListMap);
 		
 		return nodes; //Returns all service nodes for next refreshing each SDK
 	}
@@ -104,32 +104,32 @@ public class ServiceCache {
 	 */
 	public static boolean isRequestAllowed(String ip, String api) {
 		if(Empty.is(ip) || api == null) return false;
-		return WhiteList.allows(RedisHelper.getString(clusterCacheIndex, ip), api);
+		return WhiteList.allows(Cacher.getString(clusterCacheIndex, ip), api);
 	}
 	
 	public static List<String> getServers(int catalog){
 		var key = ServiceNode.cacheKey(catalog);
-		var result = RedisHelper.getList(clusterCacheIndex, key);
+		var result = Cacher.getList(clusterCacheIndex, key);
 		return result != null ? result : List.of();
 	}
 	
 	public static void refreshClusterNodes(List<String> nodes, int catalog) {
 		var key = ServiceNode.cacheKey(catalog);
-		RedisHelper.remove(clusterCacheIndex,  key);
-		RedisHelper.saveList(clusterCacheIndex, key, nodes, 0);
+		Cacher.remove(clusterCacheIndex,  key);
+		Cacher.saveList(clusterCacheIndex, key, nodes, 0);
 	}
 	
 	public static void cacheSession(int userId, String ip, int agent, String session){
 		if(sessionCacheIndex < 0) return;
 		if(userId == 0 || session == null) return;
 		String key = "XM_U_SESSION".concat(String.valueOf(userId));
-		var exist = RedisHelper.getObject(sessionCacheIndex, key, UserSession.class);
+		var exist = Cacher.getObject(sessionCacheIndex, key, UserSession.class);
 		if(exist == null) {
 			var us = new UserSession(agent, ip != null ? ip : "0000", session);
-			RedisHelper.saveObject(sessionCacheIndex, key, us, UserSession.DURATION *60);
+			Cacher.saveObject(sessionCacheIndex, key, us, UserSession.DURATION *60);
 		}else {
 			exist.appendNewDevice(session, agent);
-			RedisHelper.saveObject(sessionCacheIndex, key, exist, UserSession.DURATION * 60);
+			Cacher.saveObject(sessionCacheIndex, key, exist, UserSession.DURATION * 60);
 		}
 	}
 	
@@ -137,26 +137,26 @@ public class ServiceCache {
 		if(sessionCacheIndex == -1) return true; //Ignored session comparing
 		if(userId == 0 || session == null) return false;
 		String key = "XM_U_SESSION".concat(String.valueOf(userId));
-		var result = RedisHelper.getObject(sessionCacheIndex, key, UserSession.class);
+		var result = Cacher.getObject(sessionCacheIndex, key, UserSession.class);
 		return result != null ? result.verify(agent, ip != null ? ip : "0000", session) : false;
 	}
 	
 	public static void writeApiDoc(String name, String param, String type) {
 		if(name == null) return;
 		var key = "API_".concat(name);
-		var params = RedisHelper.getMap(0, key);
+		var params = Cacher.getMap(0, key);
 		if(params != null) {
 			if(params.containsKey(param)) return;
 		}
-		RedisHelper.setMapItem(0, key, param, type);
+		Cacher.setMapItem(0, key, param, type);
 	}
 	
 	public static Map<String, Map<String, String>> getApiDocs(){
-		var keys = RedisHelper.searchKeys(0, "API_*");
+		var keys = Cacher.searchKeys(0, "API_*");
 		if(Empty.is(keys)) return Map.of();
 		var result = new HashMap<String, Map<String, String>>(1024);
 		for(var key : keys) {
-			result.put(key.substring(4), RedisHelper.getMap(0, key));
+			result.put(key.substring(4), Cacher.getMap(0, key));
 		}
 		return result;
 	}
