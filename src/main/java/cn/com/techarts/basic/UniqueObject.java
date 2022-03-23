@@ -104,7 +104,6 @@ public class UniqueObject extends IdObject {
 	 */
 	public void setPage(int page, int... start) {
 		var def = start == null || start.length == 0;
-		@SuppressWarnings("null")
 		var firstPageNumber = def ? 0 : start[0];
 		this.offset = this.psize * firstPageNumber;
 	}

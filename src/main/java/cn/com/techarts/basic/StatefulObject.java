@@ -1,6 +1,9 @@
 package cn.com.techarts.basic;
 
 public class StatefulObject extends UniqueObject {
+	
+	private static final long serialVersionUID = 1L;
+	
 	private int status;
 
 	public StatefulObject() {}

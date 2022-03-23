@@ -5,6 +5,9 @@ import org.springframework.dao.DataAccessException;
 
 public class BasicDaoException extends DataAccessException
 {	
+	
+	private static final long serialVersionUID = 1L;
+
 	public BasicDaoException( String cause)
 	{
 		super( cause);

@@ -7,6 +7,11 @@ import java.io.Serializable;
  * An instance of a subclass derived from {@link IdObject} owns a unique id(an integer) and supports serialization.
  */
 public class IdObject implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private int id;
 	
 	public int getId() {

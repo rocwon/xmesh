@@ -12,9 +12,9 @@ import org.apache.commons.dbutils.handlers.BeanListHandler;
  * based on APACHE DBUTILS and HIKARI connection pool.
  */
 public final class SimpleDaoHelper{
-	private TechartsDataSource dataSource = null;
+	private SafetyDataSource dataSource = null;
 	
-	public SimpleDaoHelper(TechartsDataSource dataSource) {
+	public SimpleDaoHelper(SafetyDataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 	
@@ -34,7 +34,7 @@ public final class SimpleDaoHelper{
 		config.setPassword(token);
 		config.setDriverClassName(driver);
 		//config.setDataSourceClassName(driver);
-		dataSource = new TechartsDataSource(config);
+		dataSource = new SafetyDataSource(config);
 	}
 	
 	public QueryRunner getExecutor() {
