@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 
 import cn.com.techarts.data.BasicDaoException;
 import cn.com.techarts.data.DaoHelper;
-import cn.com.techarts.data.Identity;
 import cn.techarts.jhelper.Converter;
 import cn.techarts.jhelper.Empty;
 import cn.techarts.jhelper.Executor;
@@ -22,7 +21,7 @@ public abstract class AbstractService
 	 * ERRID means the Id is ZERO(<b>0</b>) and it's <b>invalid</b>.
 	 * In TECHARTS, ZERO(0) is reserved for system. 
 	 * */
-	public static final int ERRID = Identity.ERRID;
+	public static final int ERRID = 0;
 	public static final double ZERO = 0.00001D;
 	
 	public DaoHelper getPersister()
@@ -61,7 +60,7 @@ public abstract class AbstractService
 	
 	public boolean checkId( int id)
 	{
-		return id < Identity.ID_INITIAL ? false : true;
+		return id < 1 ? false : true;
 	}
 	
 	public boolean checkVarArg( int[] objects)
