@@ -1,6 +1,7 @@
 package cn.com.techarts.msx;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -10,7 +11,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import cn.com.techarts.msx.rpc.MsxClient;
-import cn.com.techarts.util.FileHelper;
 import cn.techarts.jhelper.Cacher;
 import cn.techarts.jhelper.Empty;
 import cn.techarts.jhelper.Executor;
@@ -146,7 +146,7 @@ public abstract class ServiceStartupListener implements ServletContextListener {
 		var base = getApplicationBasePath();
 		if(Empty.is(base)) return null;
 		var path = base.concat(pkg.replace('.', '/'));
-		var files = FileHelper.poll(path, ".class");
+		var files = poll(path, ".class");
 		if(Empty.is(files)) return null;
 		try {
 			List<String> result = new ArrayList<>(24);
@@ -165,10 +165,34 @@ public abstract class ServiceStartupListener implements ServletContextListener {
 		}
 	}
 	
+	private static File[] poll( String srcFolder, String fileType)
+	{
+		var directory = new File( srcFolder);
+		return directory.listFiles( new XFileFilter( fileType));
+	}
+	
 	private String getApplicationBasePath() {
 		var base = getClass().getResource("/");
 		if(base == null || base.getPath() == null) return null;
 		var w = File.separatorChar == '\\'; //Windows
 		return w ? base.getPath().substring(1) : base.getPath();
+	}
+}
+
+class XFileFilter implements FileFilter
+{
+	private String type = null;
+	
+	public XFileFilter( String fileType)
+	{
+		this.type = fileType;
+	}
+	
+	@Override
+	public boolean accept( File file)
+	{
+		if( file == null) return false;
+		if( this.type == null || this.type.isEmpty()) return true;
+		return file.isFile() && file.getName().endsWith( this.type);
 	}
 }
