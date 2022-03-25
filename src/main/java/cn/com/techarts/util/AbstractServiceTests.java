@@ -8,7 +8,7 @@ import cn.com.techarts.data.DaoHelper;
 /**
  * It only can be used in Spring Framework.
  * */
-@ContextConfiguration(locations= {"file:D:/Studio/Project/Java/blade/src/main/webapp/WEB-INF/testApplicationContext.xml"})
+@ContextConfiguration(locations= {"../webapp/WEB-INF/testApplicationContext.xml"})
 public class AbstractServiceTests extends AbstractTransactionalJUnit4SpringContextTests
 {
 	public Object getBean( String id)

@@ -2,6 +2,7 @@ package cn.com.techarts.msx.cluster;
 
 import java.io.Serializable;
 import java.util.Set;
+import cn.techarts.jhelper.Finder;
 import cn.techarts.jhelper.Spliter;
 
 public class WhiteList implements Serializable{
@@ -31,12 +32,17 @@ public class WhiteList implements Serializable{
 		if(apis != null) return apis;
 		return Set.of(); //An empty set
 	}
-	
+		
+	/**
+	 * "/0" means all APIs are allowed to access.<p> 
+	 * ("/API-") Ending with "-" means the API is denied.
+	 * */
 	public static boolean allows(String services, String api) {
-		if(api == null) return false;
-		if(services == null) return false;
+		if(services == null || api == null) return false;
 		if("/0".equals(services)) return true;
-		var all = Spliter.split(services, ',');
-		return Set.copyOf(all).contains(api);
+		var all = services.split(",");
+		var index = Finder.find(all, api);
+		if(index >= 0) return true;
+		return Finder.find(all, api.concat("-")) < 0;
 	}
 }
